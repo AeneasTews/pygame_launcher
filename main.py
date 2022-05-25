@@ -1,5 +1,4 @@
 import os
-
 import pygame
 
 pygame.init()
@@ -25,13 +24,32 @@ selected = 0
 highlighted_y = 0
 highlighted_x = 0
 
-play = font.render(f'Play', True, 'White')
-play_rect = play.get_rect(center=(int(size[0] / 8) - 75, int(size[1] / 2) + 100))
-play_background = pygame.rect.Rect(int(size[0] / 16) - 75, int(size[1] / 2) + 60, 200, 75)
 
-options = font.render(f'...', True, 'White')
-options_rect = options.get_rect(center=(int(size[0] / 8) + 75, int(size[1] / 2) + 100))
-options_background = pygame.rect.Rect(int(size[0] / 16) + 138, int(size[1] / 2) + 60, 75, 75)
+def create_button(text, text_center, button_background_rect, font, text_color='White'):
+    button_text = font.render(text, True, text_color)
+    button_text_rect = button_text.get_rect(center=text_center)
+    button_background = pygame.rect.Rect(button_background_rect)
+
+    return [button_text, button_text_rect, button_background]
+
+
+def handle_button(button, standard_color=(30, 30, 30), highlighted_color=(100, 100, 100), clicked_color=(255, 255, 255),
+                  button_radius=20, click_function=print, function_option='click'):
+    mouse_position = pygame.mouse.get_pos()
+    pygame.draw.rect(screen, standard_color, button[2], border_radius=button_radius)
+    if button[2].collidepoint(mouse_position) and pygame.mouse.get_pressed()[0]:
+        pygame.draw.rect(screen, clicked_color, button[2], border_radius=20)
+        pygame.mouse.set_pos(mouse_position[0], mouse_position[1] + 100)
+        click_function(function_option)
+    elif button[2].collidepoint(mouse_position):
+        pygame.draw.rect(screen, highlighted_color, button[2], border_radius=20)
+    screen.blit(button[0], button[1])
+
+
+play_button = create_button('Play', (int(size[0] / 8) - 75, int(size[1] / 2) + 100),
+                            (int(size[0] / 16) - 75, int(size[1] / 2) + 60, 200, 75), font)
+options_button = create_button('...', (int(size[0] / 8) + 75, int(size[1] / 2) + 100),
+                               (int(size[0] / 16) + 138, int(size[1] / 2) + 60, 75, 75), font)
 
 try:
     while True:
@@ -44,8 +62,6 @@ try:
                 if pygame.mouse.get_pressed()[0]:
                     if pygame.mouse.get_pos()[0] >= size[0] / 4 and not highlighted >= len(games):
                         selected = highlighted
-                    elif play_background.collidepoint(pygame.mouse.get_pos()):
-                        os.system(f'python ./{games[selected]}/main.py')
 
         games = []
         for path in os.listdir('./'):
@@ -114,15 +130,8 @@ try:
             title_rect = title.get_rect(topleft=(25, int(size[1] / 2)))
             screen.blit(title, title_rect)
 
-            pygame.draw.rect(screen, (30, 30, 30), play_background, border_radius=20)
-            if play_background.collidepoint(mouse_pos):
-                pygame.draw.rect(screen, (100, 100, 100), play_background, border_radius=20)
-            elif play_background.collidepoint(mouse_pos) and pygame.mouse.get_pressed()[0]:
-                pygame.draw.rect(screen, (250, 250, 250), play_background, border_radius=20)
-            screen.blit(play, play_rect)
-
-            pygame.draw.rect(screen, (30, 30, 30), options_background, border_radius=20)
-            screen.blit(options, options_rect)
+            handle_button(play_button, click_function=os.system, function_option=f'python {games[selected]}/main.py')
+            handle_button(options_button)
         # pygame.draw.line(surface=screen, color='Red', start_pos=(0, highlighted_y * 100), end_pos=(1600,
         # highlighted_y * 100), width=1)
         # pygame.draw.line(surface=screen, color='Red', start_pos=(highlighted_x * ((
