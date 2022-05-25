@@ -26,8 +26,12 @@ highlighted_y = 0
 highlighted_x = 0
 
 play = font.render(f'Play', True, 'White')
-play_rect = play.get_rect(center=(int(size[0] / 8), int(size[1] / 2) + 100))
-play_background = pygame.rect.Rect(100, int(size[1] / 2) + 60, 200, 75)
+play_rect = play.get_rect(center=(int(size[0] / 8) - 75, int(size[1] / 2) + 100))
+play_background = pygame.rect.Rect(int(size[0] / 16) - 75, int(size[1] / 2) + 60, 200, 75)
+
+options = font.render(f'...', True, 'White')
+options_rect = options.get_rect(center=(int(size[0] / 8) + 75, int(size[1] / 2) + 100))
+options_background = pygame.rect.Rect(int(size[0] / 16) + 138, int(size[1] / 2) + 60, 75, 75)
 
 try:
     while True:
@@ -48,7 +52,7 @@ try:
             full_path = os.path.join('./', path)
             if not os.path.isfile(full_path) and not full_path.__contains__(
                     '.DS') and not full_path.__contains__('.idea') and \
-                    not full_path.__contains__('venv'):
+                    not full_path.__contains__('venv') and not full_path.__contains__('.git'):
                 games.append(f'{path}')
 
         # Get which Game the mouse is over
@@ -109,14 +113,16 @@ try:
             title = font.render(f'{games[selected]}', True, 'White')
             title_rect = title.get_rect(topleft=(25, int(size[1] / 2)))
             screen.blit(title, title_rect)
+
             pygame.draw.rect(screen, (30, 30, 30), play_background, border_radius=20)
             if play_background.collidepoint(mouse_pos):
                 pygame.draw.rect(screen, (100, 100, 100), play_background, border_radius=20)
             elif play_background.collidepoint(mouse_pos) and pygame.mouse.get_pressed()[0]:
                 pygame.draw.rect(screen, (250, 250, 250), play_background, border_radius=20)
-
             screen.blit(play, play_rect)
 
+            pygame.draw.rect(screen, (30, 30, 30), options_background, border_radius=20)
+            screen.blit(options, options_rect)
         # pygame.draw.line(surface=screen, color='Red', start_pos=(0, highlighted_y * 100), end_pos=(1600,
         # highlighted_y * 100), width=1)
         # pygame.draw.line(surface=screen, color='Red', start_pos=(highlighted_x * ((
